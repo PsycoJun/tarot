@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tarot Reading</title>
+    <style>
+        button {
+            display: block;
+            margin: 10px;
+            padding: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>타로 점</h1>
+    <div id="buttons">
+        {% for i in button_range %}
+        <button onclick="toggleButton({{ i }})" id="button-{{ i }}">Button {{ i }}</button>
+        {% endfor %}
+    </div>
+    <button onclick="sendResult()">결과 보기</button>
+
+    <meta name="csrf-token" content="{% csrf_token %}">
+
+    <script>
+        let clickedButtons = new Set();
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function toggleButton(buttonId) {
+            const button = document.getElementById(`button-${buttonId}`);
+            if (clickedButtons.has(buttonId)) {
+                clickedButtons.delete(buttonId);
+                button.style.backgroundColor = ''; // 원래 색상으로 변경
+            } else {
+                clickedButtons.add(buttonId);
+                button.style.backgroundColor = 'yellow'; // 클릭된 버튼 표시 색상
+            }
+        }
+
+        function sendResult() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            fetch('/send_result/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ count: clickedButtons.size })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // API 결과를 처리합니다.
+                console.log(data);
+                alert(`타로 카드: ${JSON.stringify(data)}`);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
