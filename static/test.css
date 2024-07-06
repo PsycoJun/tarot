@@ -1,0 +1,72 @@
+body {
+     background-image: url('/static/texture.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: top left;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(4, 150px);
+    grid-template-rows: repeat(2, 200px);
+    gap: 20px;
+    position: relative;
+}
+
+.card:hover {
+        transform: scale(1.1); /* 호버 시 크기를 1.1배로 확대 */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 그림자 효과 추가 */
+    }
+
+.card {
+    width: 150px;
+    height: 200px;
+    background-image: url('/static/tarot.png');
+    background-size: cover; /* 이미지 크기를 div에 맞게 조정 */
+    background-position: center; /* 이미지의 위치를 가운데로 설정 */
+    background-repeat: no-repeat; /* 이미지 반복을 방지 */
+    transition: transform 0.3s ease; /* 변화가 부드럽게 일어나도록 설정 */
+}
+
+#card1 { grid-column: 1 / 2; grid-row: 1 / 2; }
+#card2 { grid-column: 2 / 3; grid-row: 1 / 2; }
+#card3 { grid-column: 3 / 4; grid-row: 1 / 2; }
+#card4 { grid-column: 4 / 5; grid-row: 1 / 2; }
+#card5 { grid-column: 1 / 2; grid-row: 2 / 3; }
+#card6 { grid-column: 2 / 3; grid-row: 2 / 3; }
+#card7 { grid-column: 3 / 4; grid-row: 2 / 3; }
+#card8 { grid-column: 4 / 5; grid-row: 2 / 3; }
+
+
+
+/*.deck {*/
+/*    width: 200px;*/
+/*    height: 250px;*/
+/*    background-image: url('/static/tarot_stacked.png');*/
+/*    background-size: cover; !* 이미지 크기를 div에 맞게 조정 *!*/
+/*    background-position: center; !* 이미지의 위치를 가운데로 설정 *!*/
+/*    background-repeat: no-repeat; !* 이미지 반복을 방지 *!*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    position: absolute;*/
+/*    left: -200px;*/
+/*    bottom: -150px;*/
+/*}*/
+
+.button {
+    position: absolute;
+    left: 50%;
+    bottom: -50px;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    font-size: 16px;
+}
