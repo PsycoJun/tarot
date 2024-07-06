@@ -13,10 +13,11 @@
         <div class="card" onclick="toggleButton({{ i }})" id="button-{{ i }}"></div>
         {% endfor %}
         <div class="deck">덱</div>
-        <button class="button smoke dark">Result</button>
+        <button class="button smoke dark" id="submit-button">Result</button>
     </div>
 </body>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/static/transmission.js"></script>
 <script src="/static/scripts.js"></script>
 <script src="/static/button_scripts.js"></script>
 </html>
