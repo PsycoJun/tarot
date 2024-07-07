@@ -23,7 +23,7 @@ $(document).ready(function() {
             console.log(clickedButtons)
             $.ajax({
                 type: 'POST',
-                url: '/process/',
+                url: '/process_result/',
                 headers: {
                 'X-CSRFToken': csrftoken
                 },
@@ -33,9 +33,13 @@ $(document).ready(function() {
                 success: function(response) {
                     console.log(response);
                     // 성공 시 처리 로직
+                    $('#result-container').show();
+                    $('#result').html('<p>해석: ' + response.result + '</p>')
                 },
-                error: function(error) {
-                    console.log(error);
+                error: function(response) {
+                    console.error(response);
+                    $('#result-container').show()
+                    $('#result').html('<p>타로 결과를 보여드릴 수 없어요. ') + response.error + '</p>'
                     // 오류 처리 로직
                 }
             });
