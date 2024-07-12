@@ -6,30 +6,146 @@ from django.views.decorators.http import require_POST
 import json
 import random
 
-API_KEY='NOT_API_KEY'#실제 API 키가 아님
+API_KEY='환경변수 넣으삼'#실제 API 키가 아님
 
 genai.configure(api_key=API_KEY)#Gemini API 키 설정
 model=genai.GenerativeModel('gemini-pro')
 
+# deck = [
+#     "바보", "마술사", "여사제", "여황제", "황제",
+#     "교황", "연인", "전차", "힘", "은둔자",
+#     "운명의 수레바퀴", "정의", "매달린 사람", "죽음", "절제",
+#     "악마", "탑", "별", "달", "태양", "심판",
+#     "세계", "완드 에이스", "완드 2번", "완드 3번", "완드 4번",
+#     "완드 5번", "완드 6번", "완드 7번", "완드 8번", "완드 9번",
+#     "완드 10번", "완드 시종", "완드 기사", "완드 여왕", "완드 왕",
+#     "컵 에이스", "컵 2번", "컵 3번", "컵 4번", "컵 5번",
+#     "컵 6번", "컵 7번", "컵 8번", "컵 9번", "컵 10번",
+#     "컵 시종", "컵 기사", "컵 여왕", "컵 왕",
+#     "검 에이스", "검 2번", "검 3번", "검 4번",
+#     "검 5번", "검 6번", "검 7번", "검 8번",
+#     "검 9번", "검 10번", "검 시종", "검 기사",
+#     "검 여왕", "검 왕", "펜타클 에이스", "펜타클 2번",
+#     "펜타클 3번", "펜타클 4번", "펜타클 5번", "펜타클 6번",
+#     "펜타클 7번", "펜타클 8번", "펜타클 9번", "펜타클 10번",
+#     "펜타클 시종", "펜타클 기사", "펜타클 여왕", "펜타클 왕"
+# ]
+
+# 기존의 tarot_cards 리스트와 빈 값으로 초기화된 tarot_cards_dict
 deck = [
-    "바보", "마술사", "여사제", "여황제", "황제",
-    "교황", "연인", "전차", "힘", "은둔자",
-    "운명의 수레바퀴", "정의", "매달린 사람", "죽음", "절제",
-    "악마", "탑", "별", "달", "태양", "심판",
-    "세계", "완드 에이스", "완드 2번", "완드 3번", "완드 4번",
-    "완드 5번", "완드 6번", "완드 7번", "완드 8번", "완드 9번",
-    "완드 10번", "완드 시종", "완드 기사", "완드 여왕", "완드 왕",
-    "컵 에이스", "컵 2번", "컵 3번", "컵 4번", "컵 5번",
-    "컵 6번", "컵 7번", "컵 8번", "컵 9번", "컵 10번",
-    "컵 시종", "컵 기사", "컵 여왕", "컵 왕",
-    "검 에이스", "검 2번", "검 3번", "검 4번",
-    "검 5번", "검 6번", "검 7번", "검 8번",
-    "검 9번", "검 10번", "검 시종", "검 기사",
-    "검 여왕", "검 왕", "펜타클 에이스", "펜타클 2번",
-    "펜타클 3번", "펜타클 4번", "펜타클 5번", "펜타클 6번",
-    "펜타클 7번", "펜타클 8번", "펜타클 9번", "펜타클 10번",
-    "펜타클 시종", "펜타클 기사", "펜타클 여왕", "펜타클 왕"
+    'the-fool', 'the-magician', 'the-high-priestess', 'the-empress',
+    'the-emperor', 'the-hierophant', 'the-lovers', 'the-chariot',
+    'strength', 'the-hermit', 'wheel-of-fortune', 'justice',
+    'the-hanged-man', 'death', 'temperance', 'the-devil',
+    'the-tower', 'the-star', 'the-moon', 'the-sun',
+    'judgement', 'the-world',
+    'ace-of-wands', 'two-of-wands', 'three-of-wands', 'four-of-wands',
+    'five-of-wands', 'six-of-wands', 'seven-of-wands', 'eight-of-wands',
+    'nine-of-wands', 'ten-of-wands', 'page-of-wands', 'knight-of-wands',
+    'queen-of-wands', 'king-of-wands',
+    'ace-of-cups', 'two-of-cups', 'three-of-cups', 'four-of-cups',
+    'five-of-cups', 'six-of-cups', 'seven-of-cups', 'eight-of-cups',
+    'nine-of-cups', 'ten-of-cups', 'page-of-cups', 'knight-of-cups',
+    'queen-of-cups', 'king-of-cups',
+    'ace-of-swords', 'two-of-swords', 'three-of-swords', 'four-of-swords',
+    'five-of-swords', 'six-of-swords', 'seven-of-swords', 'eight-of-swords',
+    'nine-of-swords', 'ten-of-swords', 'page-of-swords', 'knight-of-swords',
+    'queen-of-swords', 'king-of-swords',
+    'ace-of-coins', 'two-of-coins', 'three-of-coins', 'four-of-coins',
+    'five-of-coins', 'six-of-coins', 'seven-of-coins', 'eight-of-coins',
+    'nine-of-coins', 'ten-of-coins', 'page-of-coins', 'knight-of-coins',
+    'queen-of-coins', 'king-of-coins'
 ]
+
+tarot_cards_dict = {
+    'the-fool': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/0.jpg',
+    'the-magician': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/1.jpg',
+    'the-high-priestess': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/2.jpg',
+    'the-empress': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/3.jpg',
+    'the-emperor': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/4.jpg',
+    'the-hierophant': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/5.jpg',
+    'the-lovers': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/6.jpg',
+    'the-chariot': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/7.jpg',
+    'strength': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/8.jpg',
+    'the-hermit': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/9.jpg',
+    'wheel-of-fortune': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/10.jpg',
+    'justice': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/11.jpg',
+    'the-hanged-man': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/12.jpg',
+    'death': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/13.jpg',
+    'temperance': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/14.jpg',
+    'the-devil': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/15.jpg',
+    'the-tower': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/16.jpg',
+    'the-star': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/17.jpg',
+    'the-moon': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/18.jpg',
+    'the-sun': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/19.jpg',
+    'judgement': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/20.jpg',
+    'the-world': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/21.jpg',
+    'ace-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/22.jpg',
+    'two-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/23.jpg',
+    'three-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/24.jpg',
+    'four-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/25.jpg',
+    'five-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/26.jpg',
+    'six-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/27.jpg',
+    'seven-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/28.jpg',
+    'eight-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/29.jpg',
+    'nine-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/30.jpg',
+    'ten-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/31.jpg',
+    'page-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/32.jpg',
+    'knight-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/33.jpg',
+    'queen-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/34.jpg',
+    'king-of-wands': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/35.jpg',
+    'ace-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/36.jpg',
+    'two-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/37.jpg',
+    'three-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/38.jpg',
+    'four-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/39.jpg',
+    'five-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/40.jpg',
+    'six-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/41.jpg',
+    'seven-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/42.jpg',
+    'eight-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/43.jpg',
+    'nine-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/44.jpg',
+    'ten-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/45.jpg',
+    'page-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/46.jpg',
+    'knight-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/47.jpg',
+    'queen-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/48.jpg',
+    'king-of-cups': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/49.jpg',
+    'ace-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/50.jpg',
+    'two-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/51.jpg',
+    'three-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/52.jpg',
+    'four-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/53.jpg',
+    'five-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/54.jpg',
+    'six-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/55.jpg',
+    'seven-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/56.jpg',
+    'eight-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/57.jpg',
+    'nine-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/58.jpg',
+    'ten-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/59.jpg',
+    'page-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/60.jpg',
+    'knight-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/61.jpg',
+    'queen-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/62.jpg',
+    'king-of-swords': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/63.jpg',
+    'ace-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/64.jpg',
+    'two-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/65.jpg',
+    'three-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/66.jpg',
+    'four-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/67.jpg',
+    'five-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/68.jpg',
+    'six-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/69.jpg',
+    'seven-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/70.jpg',
+    'eight-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/71.jpg',
+    'nine-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/72.jpg',
+    'ten-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/73.jpg',
+    'page-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/74.jpg',
+    'knight-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/75.jpg',
+    'queen-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/76.jpg',
+    'king-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/77.jpg',
+}
+
+# 딕셔너리 출력
+for card, url in tarot_cards_dict.items():
+    print(f"Card: {card}, Image URL: {url}")
+
+
+# 딕셔너리 순회 및 결과 출력
+for card, url in tarot_cards_dict.items():
+    print(f"Card: {card}, Image URL: {url}")
 
 
 
@@ -97,7 +213,11 @@ def process_result(request):
 #예시
 당신이 선택한 카드는 광대, 마술사, 검 6번 입니다. 광대는 새로운 시작, 순수함, 무모함 믿음의 도약을 의미하며 마술사는 능숙함, 의지력, 창의성, 가능성. 잠재력을 의미하죠. 검 6번은 평화, 조화 갈등 해결, 과거 극복, 용서를 의미합니다. 흥미로운 조합이에요. 광대는 새로운 시작과 무모한 도약을 상징하며, 마술사는 능숙함과 창의성으로 그 여정을 이끌어갈 것을 의미합니다. 검 6번은 갈등 해결과 용서를 통해 마음의 평화를 찾을 수 있음을 나타내요. 이 카드들은 당신이 새로운 도전을 앞에 두고 있다고 말하는군요. 당신에게는 뛰어난 능숙함과 창의성이 있으니 자신감을 가지고 앞으로 나아가야 해요. 그 여정에 있는 갈등에 얽매이지 말고 용서와 조화를 통해 마음의 평화 또한 얻을 수 있을 것입니다. """)
 
-        response={'result': result.text}
+        resultCard = {}
+        for idx, cardName in enumerate(cards):
+            resultCard[count[idx]] = tarot_cards_dict[cardName]
+
+        response={'result': result.text, 'cards': resultCard}
         
         
         

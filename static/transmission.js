@@ -31,8 +31,16 @@ $(document).ready(function() {
                 'clickedButtons': Array.from(clickedButtons)  // set을 배열로 변환하여 전송
                 }),
                 success: function(response) {
-                    console.log(response);
-                    // 성공 시 처리 로직
+                    console.log(response.cards);
+
+                    Object.entries(response.cards).forEach(([card, imageUrl]) => {
+                        console.log(`Card: ${card}, Image URL: ${imageUrl}`);
+                        const tarotImage = document.getElementById('button-'+card);
+
+                            // 이미지 변경
+                        tarotImage.style.backgroundImage =  `url(${imageUrl})`;
+                            // 여기서 다른 작업 수행 가능
+                    });
                     $('#result-container').show();
                     $('#result').html('<p>해석: ' + response.result + '</p>')
                 },
