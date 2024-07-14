@@ -1,3 +1,22 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+}
+
+#result-container {
+    width: 100%;
+    margin-top: 50px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
 body {
      background-image: url('/static/texture.jpg');
     background-repeat: no-repeat;
@@ -6,9 +25,10 @@ body {
 
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start;
+    min-height: 100vh;
     margin: 0;
+    padding: 50px 0;
 }
 
 
@@ -27,13 +47,24 @@ body {
     }
 
 .card {
+    color: #ff6600;
     width: 150px;
     height: 200px;
+    background-size: cover;
+    background-position: center;
     background-image: url('/static/tarot.png');
-    background-size: cover; /* 이미지 크기를 div에 맞게 조정 */
-    background-position: center; /* 이미지의 위치를 가운데로 설정 */
-    background-repeat: no-repeat; /* 이미지 반복을 방지 */
-    transition: transform 0.3s ease; /* 변화가 부드럽게 일어나도록 설정 */
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    margin: 10px;
+    /*position: relative;*/
+    /*transform-style: preserve-3d;*/
+    /*width: 150px;*/
+    /*height: 200px;*/
+    /*background-image: url('/static/tarot.png');*/
+    /*background-size: cover; !* 이미지 크기를 div에 맞게 조정 *!*/
+    /*background-position: center; !* 이미지의 위치를 가운데로 설정 *!*/
+    /*background-repeat: no-repeat; !* 이미지 반복을 방지 *!*/
+    /*transition: transform 0.3s ease; !* 변화가 부드럽게 일어나도록 설정 *!*/
 }
 
 #card1 { grid-column: 1 / 2; grid-row: 1 / 2; }
@@ -69,4 +100,8 @@ body {
     transform: translateX(-50%);
     padding: 10px 20px;
     font-size: 16px;
+}
+
+#result {
+    margin-top: 15px;
 }

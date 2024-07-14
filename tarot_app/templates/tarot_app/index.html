@@ -8,12 +8,19 @@
     <link rel="stylesheet" href="/static/test.css">
 </head>
 <body>
-    <div class="container">
-        {% for i in button_range %}
-        <div class="card" onclick="toggleButton({{ i }})" id="button-{{ i }}"></div>
-        {% endfor %}
-        <div class="deck">덱</div>
-        <button class="button smoke dark" id="submit-button">Result</button>
+    <div class="main-container">
+        <div class="container">
+            {% for i in button_range %}
+            <div class="card" onclick="toggleButton({{ i }})" id="button-{{ i }}"></div>
+            {% endfor %}
+            <div class="deck">덱</div>
+            <button class="button smoke dark" id="submit-button">결과 확인</button>
+        </div>
+        <br><br>
+        <div id="result-container" style="display: none;">
+            <h2>타로 결과</h2>
+            <div id="result"></div>
+        </div>
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
