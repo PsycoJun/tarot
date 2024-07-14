@@ -21,6 +21,8 @@ $(document).ready(function() {
             e.preventDefault();
             var csrftoken = getCookie('csrftoken');
             console.log(clickedButtons)
+            const loading = document.getElementById('loading');
+            loading.style.display = "block";
             $.ajax({
                 type: 'POST',
                 url: '/process_result/',
@@ -59,6 +61,7 @@ $(document).ready(function() {
                     });
                     $('#result-container').show();
                     $('#result').html('<p>해석: ' + response.result + '</p>')
+                    loading.style.display = "none";
                 },
                 error: function(response) {
                     console.error(response);
