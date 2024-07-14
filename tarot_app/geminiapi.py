@@ -213,9 +213,9 @@ def process_result(request):
 
         resultCard = {}
         for idx, cardName in enumerate(cards):
-            resultCard[count[idx]] = tarot_cards_dict[cardName]
+            resultCard[count[idx]] = cardName+"~"+tarot_cards_dict[cardName]
 
-        response = {'result': result.text, 'cards': resultCard , 'cardsName' : cards}
+        response = {'result': result.text, 'cards': resultCard }
 
         return JsonResponse(response)
 

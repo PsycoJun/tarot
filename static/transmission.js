@@ -34,7 +34,9 @@ $(document).ready(function() {
                     console.log(response.cards);
                     let i = 0;
                     Object.entries(response.cards).forEach(([card, imageUrl]) => {
-                        console.log(`Card: ${card}, Image URL: ${imageUrl}`);
+                        let spl = imageUrl.split("~");
+
+                        console.log(`Card: ${card}, Image URL: ${spl[1]}`);
                         const tarotImage = document.getElementById('button-'+card);
                         // 이미지 뒤집기 클래스 추가
                         tarotImage.style.transform="rotateY(180deg)"
@@ -43,10 +45,10 @@ $(document).ready(function() {
                         setTimeout(() => {
                             tarotImage.style.transform=""
                             tarotImage.style.transform = 'scale(1.0)'; // 클릭된 버튼 표시 색상
-                            tarotImage.style.backgroundImage =  `url(${imageUrl})`;
+                            tarotImage.style.backgroundImage =  `url(${spl[1]})`;
                             tarotImage.style.textAlign = "center"
                             tarotImage.style.fontWeight = "bold"
-                            tarotImage.textContent = response.cardsName[i++];
+                            tarotImage.textContent = spl[0];
 
                             // 이미지 뒤집기 클래스 제거 (다음 애니메이션을 위해)
 
