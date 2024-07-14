@@ -5,8 +5,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import json
 import random
+import os
 
-API_KEY='환경변수 넣으삼'#실제 API 키가 아님
+API_KEY = os.environ.get("API_KEY")
 
 genai.configure(api_key=API_KEY)#Gemini API 키 설정
 model=genai.GenerativeModel('gemini-pro')
@@ -157,14 +158,11 @@ random_numbers=[]
 def table_reset(request):
     global table_reset_tag
     data=json.loads(request.body)
-    tag=data.get('tablereset', [])
+    tag=data.API_KEY('tablereset', [])
     tag=tag[0]
     if tag==1:
         table_reset_tag=0
-    return 
-        
-    
-
+    return
 
 
 @csrf_exempt
@@ -176,30 +174,30 @@ def process_result(request):
     try:
         data = json.loads(request.body)
         print("Parsed data:", data)
-        count =data.get('clickedButtons', [])
+        count = data.get('clickedButtons', [])
         print(count)
-        numbers=len(count)
+        numbers = len(count)
         print(f'선택한수: {numbers}')
-        
-        if not isinstance(numbers, int) or numbers not in[1,2,3,4,5,6,7,8]:
-            response={'error': '카드를 선택해야 합니다.'}
+
+        if not isinstance(numbers, int) or numbers not in [1, 2, 3, 4, 5, 6, 7, 8]:
+            response = {'error': '카드를 선택해야 합니다.'}
             return JsonResponse(response, status=400)
-        
-        if table_reset_tag==0:#태그가 0일 경우 카드 테이블을 초기화하고 다시 제작
-            random_numbers=[]
-            for _ in range(8):#0,1,2,3,4,5,6,7
-                num=random.randint(1,78)
+
+        if table_reset_tag == 0:  # 태그가 0일 경우 카드 테이블을 초기화하고 다시 제작
+            random_numbers = []
+            for _ in range(8):  # 0,1,2,3,4,5,6,7
+                num = random.randint(1, 78)
                 while num in random_numbers:
-                    num=random.randint(1,78)
+                    num = random.randint(1, 78)
                 random_numbers.append(num)
-            table_reset_tag=1
+            table_reset_tag = 1
         print(random_numbers)
-        #random_numbers의 index는 0~8까지
-        cards=[]
-        cards=[deck[random_numbers[i-1]] for i in count]#i: 0~7 / count: 1~8
+        # random_numbers의 index는 0~8까지
+        cards = []
+        cards = [deck[random_numbers[i - 1]] for i in count]  # i: 0~7 / count: 1~8
         print(cards)
-        #deck의 index는 0~77까지
-        result=model.generate_content(f"""#입력문
+        # deck의 index는 0~77까지
+        result = model.generate_content(f"""#입력문
 너는 타로 점을 보는 사람이다. 어떤 사람이 선택한 타로 카드를 보고 그 타로 카드의 의미와 연관지어서 점을 보면 된다. 그 사람이 선택한 타로 카드는 [#카드]에 있다. 어떻게 대답해야 하는지는 [#출력형식]과 [#예시]를 참고한다. 
 #카드
 {cards}
@@ -217,16 +215,13 @@ def process_result(request):
         for idx, cardName in enumerate(cards):
             resultCard[count[idx]] = tarot_cards_dict[cardName]
 
-        response={'result': result.text, 'cards': resultCard}
-        
-        
-        
+        response = {'result': result.text, 'cards': resultCard , 'cardsName' : cards}
+
         return JsonResponse(response)
-    
+
     except json.JSONDecodeError:
-        response={'error': '잘못된 Json 형식입니다. '}
+        response = {'error': '잘못된 Json 형식입니다. '}
         return JsonResponse(response, status=400)
     except Exception as e:
-        response={'error': f'서버 오류: {str(e)}'}
+        response = {'error': f'서버 오류: {str(e)}'}
         return JsonResponse(response, status=500)
-        
