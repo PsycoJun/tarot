@@ -5,7 +5,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import json
 import random
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 API_KEY = os.environ.get("API_KEY")
 
