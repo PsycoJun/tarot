@@ -165,11 +165,14 @@ function detectShapeFromClickedButtons(clickedButtons) {
         window.order=cardOrder;
         if (cardOrder[0] === 8 && cardOrder[1] === 7 && cardOrder[2] === 6 && cardOrder[3] === 5) {
             console.log('The clicked buttons form a Future spread.');
+            return 'Future-1';
         } else {
             console.log('The clicked buttons do not form a recognized spread.');
+            return 'Triangle';
         }
     } else {
         console.log('Unsupported number of clicked buttons.');
+        return 'error';
     }
 }
 
