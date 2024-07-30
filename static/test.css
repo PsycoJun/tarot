@@ -5,6 +5,9 @@
     width: 100%;
     max-width: 800px;
 }
+#submit-button {
+    margin-bottom: 15px;
+}
 
 #card-container {
     width: 800px; /* 원하는 너비 설정 */
