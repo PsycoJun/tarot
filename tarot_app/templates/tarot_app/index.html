@@ -8,15 +8,24 @@
     <link rel="stylesheet" href="/static/test.css">
 </head>
 <body>
-    <div class="main-container">
-        <div class="container">
-            {% for i in button_range %}
-            <div class="card" onclick="toggleButton({{ i }})" id="button-{{ i }}"></div>
-            {% endfor %}
-            <div class="deck">덱</div>
+    <div class="main-container main-wrapper">
+        <div class="wrapper">
+            <div class="container" style="background-color: rgb(255, 255, 255, 0); border: 1px;">
+                {% for i in button_range %}
+                <div class="card draggable" id="button-{{ i }}"></div>
+                {% endfor %}
+                
+            </div>
+            <div id="card-container" style="background-image: url('/static/tile.jpg');">
+                
+            </div>
+        </div><br>
+        <div class="search">
+            <input id="search-input" placeholder="고민이 무엇인가요?" />
+            
             <button class="button smoke dark" id="submit-button">결과 확인</button>
         </div>
-        <br><br>
+        <button id="positioncheck">검사</button>
         <div id="result-container" style="display: none;">
             <h2>타로 결과</h2>
             <div id="result"></div>
@@ -30,6 +39,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/static/transmission.js"></script>
 <script src="/static/scripts.js"></script>
+<script src="/static/positioncheck.js"></script>
+<script src="/static/drag.js"></script>
 <script src="/static/button_scripts.js"></script>
 </html>
 <!-- dribbble - twitter -->

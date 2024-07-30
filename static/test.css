@@ -6,13 +6,45 @@
     max-width: 800px;
 }
 
+#card-container {
+    width: 800px; /* 원하는 너비 설정 */
+    height: 600px; /* 원하는 높이 설정 */
+    border: 2px solid rgba(255, 255, 255, 0.5); /* 반투명한 테두리 */
+    background-color: transparent; /* 내부는 투명 */
+    box-sizing: border-box; /* 테두리를 포함한 전체 크기 설정 */
+    margin: 0 auto; /* 가운데 정렬 */
+}
+
+.wrapper {
+    display: flex; /* 수평으로 정렬하기 위한 flexbox */
+    gap: 20px; /* 요소 사이의 간격 */
+    padding: 20px; /* 전체 여백 */
+    align-items: flex-start; /* 상단 정렬 */
+    overflow: auto; /* 내용이 넘칠 경우 스크롤 가능 */
+}
+
+.container {
+    width: 200px; /* 원하는 너비 설정 */
+    height: 600px; /* 카드 높이와 동일하게 설정 */
+    background-color: #f0f0f0; /* 배경색을 추가하여 컨테이너의 경계를 확인할 수 있도록 설정 */
+    padding: 20px; /* 내부 여백 */
+    border-radius: 10px; /* 둥근 모서리 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+}
+
 #result-container {
-    width: 100%;
-    margin-top: 50px;
+    width: 80%; /* 원하는 너비 설정 (예: 80%로 설정) */
+    max-width: 600px; /* 최대 너비 설정 (예: 600px로 설정) */
+    margin: 50px auto; /* 위쪽 여백 50px, 중앙 정렬 */
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.8); /* 반투명한 흰색 배경 */
+    border-radius: 10px; /* 둥근 모서리 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+}
+
+.draggable {
+    position: absolute;
+    cursor: grab;
 }
 
 
@@ -158,14 +190,6 @@ body {
         }
 
 
-.container {
-    display: grid;
-    grid-template-columns: repeat(4, 150px);
-    grid-template-rows: repeat(2, 200px);
-    gap: 20px;
-    position: relative;
-}
-
 .card:hover {
         transform: scale(1.1); /* 호버 시 크기를 1.1배로 확대 */
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* 그림자 효과 추가 */
@@ -173,14 +197,15 @@ body {
 
 .card {
     color: #ff6600;
-    width: 150px;
-    height: 200px;
+    width: 120px;
+    height: 170px;
     background-size: cover;
     background-position: center;
     background-image: url('/static/tarot.png');
     transition: transform 0.6s;
     transform-style: preserve-3d;
     margin: 10px;
+    margin-left: 18px;
     /*position: relative;*/
     /*transform-style: preserve-3d;*/
     /*width: 150px;*/
@@ -192,14 +217,26 @@ body {
     /*transition: transform 0.3s ease; !* 변화가 부드럽게 일어나도록 설정 *!*/
 }
 
-#card1 { grid-column: 1 / 2; grid-row: 1 / 2; }
-#card2 { grid-column: 2 / 3; grid-row: 1 / 2; }
-#card3 { grid-column: 3 / 4; grid-row: 1 / 2; }
-#card4 { grid-column: 4 / 5; grid-row: 1 / 2; }
-#card5 { grid-column: 1 / 2; grid-row: 2 / 3; }
-#card6 { grid-column: 2 / 3; grid-row: 2 / 3; }
-#card7 { grid-column: 3 / 4; grid-row: 2 / 3; }
-#card8 { grid-column: 4 / 5; grid-row: 2 / 3; }
+/* 검색 */
+.main-wrapper .search {
+    display: flex;
+    justify-content: center;
+}
+.main-wrapper #search-input {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: var(--medium);
+    padding: 15px 0px;
+    border-radius: 30px;
+    border: 0px;
+    width: 600px;
+    text-align: center;
+    margin-top: -15px;
+}
+.main-wrapper #search-input::placeholder {
+    color: rgb(169, 169, 169);
+    font-size: var(--medium);
+}
 
 
 
@@ -218,14 +255,7 @@ body {
 /*    bottom: -150px;*/
 /*}*/
 
-.button {
-    position: absolute;
-    left: 50%;
-    bottom: -50px;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    font-size: 16px;
-}
+
 
 #result {
     margin-top: 15px;

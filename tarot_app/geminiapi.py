@@ -142,14 +142,6 @@ tarot_cards_dict = {
     'king-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/77.jpg',
 }
 
-# 딕셔너리 출력
-for card, url in tarot_cards_dict.items():
-    print(f"Card: {card}, Image URL: {url}")
-
-
-# 딕셔너리 순회 및 결과 출력
-for card, url in tarot_cards_dict.items():
-    print(f"Card: {card}, Image URL: {url}")
 
 
 
@@ -174,6 +166,7 @@ def process_result(request):
     global table_reset_tag
     global random_numbers
     print("Received request body:", request.body)
+
     try:
         data = json.loads(request.body)
         print("Parsed data:", data)
