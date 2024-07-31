@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     tarotImage.style.backgroundImage = `url(${spl[1]})`;
                     tarotImage.style.textAlign = "center";
                     tarotImage.style.fontWeight = "bold";
+                    tarotImage.style.border = "3px solid gray"
                     tarotImage.textContent = spl[0];
                 }, 600);
             });

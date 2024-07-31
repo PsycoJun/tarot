@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 import json
 import random
 from dotenv import load_dotenv
+import urllib.parse
 import os
 
 load_dotenv()
@@ -168,11 +169,19 @@ def process_result(request):
     print("Received request body:", request.body)
 
     try:
-        data = json.loads(request.body)
+        # URL 디코딩
+        decoded_json_str = urllib.parse.unquote(request.body)
+
+# JSON 문자열을 파이썬 객체로 디코딩
+        data = json.loads(decoded_json_str)
+
+        print(data)
         print("Parsed data:", data)
         count = data.get('clickedButtons', [])
         print(count)
         numbers = len(count)
+        spread = data.get('spread', "")
+        question = data.get('question', "")
         print(f'선택한수: {numbers}')
 
         if not isinstance(numbers, int) or numbers not in [1, 2, 3, 4, 5, 6, 7, 8]:
@@ -191,22 +200,39 @@ def process_result(request):
         # random_numbers의 index는 0~8까지
         cards = []
         cards = [deck[random_numbers[i - 1]] for i in count]  # i: 0~7 / count: 1~8
-        print(cards)
+        print("출력>" , cards, spread, question)
         # deck의 index는 0~77까지
         result = model.generate_content(f"""#입력문
-너는 타로 점을 보는 사람이다. 어떤 사람이 선택한 타로 카드를 보고 그 타로 카드의 의미와 연관지어서 점을 보면 된다. 그 사람이 선택한 타로 카드는 [#카드]에 있다. 어떻게 대답해야 하는지는 [#출력형식]과 [#예시]를 참고한다. 
+너는 타로 점을 보는 사람이다. 어떤 사람이 선택한 타로 카드를 보고 그 타로 카드의 의미와 연관지어서 점을 보면 된다. 그 사람이 선택한 타로 카드는 [#카드]에 있다. 그 사람이 선택한 스프레드는 [#스프레드]에 있다. 어떻게 대답해야 하는지는 [#스프레드-종류]와 [#출력형식]과 [#예시]를 참고한다. 
 #카드
 {cards}
+#스프레드
+{spread}
+#스프레드-종류
+Fortune: [1.과제 : 내가 오늘 꼭 해야 할 일이 있는지, 2.상황 : 현재 오늘의 상황이 어떤지 카드를 통해서 살펴봅니다, 3.결과 : 나의 상황과 과제들의 결과가 어떻게 끝나는지 봅니다.]
+Oracle: [1.현재의 문제에 대한 조언과 상황, 2. 나아갈 길을 보여줍니다. 3.미래에 대한 조언과 상황]
+Future-1: [1.내가 이미 알고있고 활용 할 수 있는길, 2.내가 잘 할 수 있는일, 3.새로운 일, 4.내가 배울 수 있는일]
+Future-2: [1.기회 또는 경향, 현재상황에서의 조언, 2. 과거의 일, 3.,핵심요소와 지금의 상황, 4.미래와 새로운것, 5.기회 또는 경향과 현재상황에서의 조언]
+Start: [1.내가 처해있는 상황, 2.이곳에서 내가해야할 일, 3.이 상황에서 나아갈길과 목표, 4.나의 강점, 5.이 상황에서 나아갈길과 목표]
+#고민
+{question}
 #출력형식
 -선택된 카드의 의미를 순차적으로 설명한 뒤 종합적인 해석을 설명한다. 
 -사람이 사람에게 말을 하듯이 설명해야 한다. 즉 문단을 나누거나 제목을 다는 등의 행동을 해서는 안된다. 
 -결과 해석 이외의 다른 말은 하지 않는다. 
 -카드의 이름은 영어로 말해서는 안된다. 
 -해석에서 한글과 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 만을 사용한다. 
--한자, 영어, 가나 문자 등 한글 이외의 언어 문자는 사용하지 않는다. 
+-한자, 영어, 가나 문자 등 한글 이외의 언어 문자는 사용하지 않는다.
 #예시
-당신이 선택한 카드는 광대, 마술사, 검 6번 입니다. 광대는 새로운 시작, 순수함, 무모함 믿음의 도약을 의미하며 마술사는 능숙함, 의지력, 창의성, 가능성. 잠재력을 의미하죠. 검 6번은 평화, 조화 갈등 해결, 과거 극복, 용서를 의미합니다. 흥미로운 조합이에요. 광대는 새로운 시작과 무모한 도약을 상징하며, 마술사는 능숙함과 창의성으로 그 여정을 이끌어갈 것을 의미합니다. 검 6번은 갈등 해결과 용서를 통해 마음의 평화를 찾을 수 있음을 나타내요. 이 카드들은 당신이 새로운 도전을 앞에 두고 있다고 말하는군요. 당신에게는 뛰어난 능숙함과 창의성이 있으니 자신감을 가지고 앞으로 나아가야 해요. 그 여정에 있는 갈등에 얽매이지 말고 용서와 조화를 통해 마음의 평화 또한 얻을 수 있을 것입니다. """)
 
+오늘 꼭 해야 할 일로는 칼을 든 여왕이 나왔어. 이 카드는 너에게 지금 연애 상황에서 냉철하게 판단하고 이성적으로 행동할 것을 요구해. 감정에 휘둘리지 않고 명확하게 자신의 생각을 표현하는 것이 중요해.
+
+현재 상황을 나타내는 카드로는 6개의 검이 나왔어. 이 카드는 이동과 변화를 상징해. 현재 연애 상황에서 변화가 필요하다는 신호야. 지금까지 겪었던 어려움을 극복하고 더 나은 방향으로 나아갈 수 있는 기회가 있을 거야.
+
+결과를 나타내는 카드로는 8개의 컵이 나왔어. 이 카드는 떠남과 포기를 의미해. 현재의 연애에서 무언가를 포기하거나 떠나는 결정을 내려야 할 수도 있어. 이러한 결정이 힘들겠지만, 더 나은 미래를 위해 필요한 과정이야.
+
+종합적으로 보면, 너는 지금 연애에서 냉철한 판단이 필요하고, 변화의 시기가 다가오고 있어. 그리고 어떤 부분에서는 과감한 결단이 필요할 거야. 이 과정을 통해 너는 더 나은 연애를 할 수 있을 거야."""
+        )
         resultCard = {}
         for idx, cardName in enumerate(cards):
             resultCard[count[idx]] = cardName+"~"+tarot_cards_dict[cardName]
