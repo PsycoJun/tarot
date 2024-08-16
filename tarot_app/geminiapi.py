@@ -1,5 +1,5 @@
 import google.generativeai as genai
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -15,8 +15,8 @@ load_dotenv()
 
 API_KEY = os.environ.get("API_KEY")
 
-genai.configure(api_key=API_KEY)#Gemini API 키 설정
-model=genai.GenerativeModel('gemini-pro')
+genai.configure(api_key=API_KEY)  #Gemini API 키 설정
+model = genai.GenerativeModel('gemini-pro')
 
 # deck = [
 #     "바보", "마술사", "여사제", "여황제", "황제",
@@ -145,21 +145,24 @@ tarot_cards_dict = {
     'king-of-coins': 'https://gfx.tarot.com/images/site/decks/universal-waite/full_size/77.jpg',
 }
 
+table_reset_tag = 0
+random_numbers = []
 
-
-table_reset_tag=0
-random_numbers=[]
 
 @csrf_exempt
 @require_POST
 def table_reset(request):
     global table_reset_tag
-    data=json.loads(request.body)
-    tag=data.API_KEY('tablereset', [])
-    tag=tag[0]
-    if tag==1:
-        table_reset_tag=0
+    data = json.loads(request.body)
+    tag = data.API_KEY('tablereset', [])
+    tag = tag[0]
+    if tag == 1:
+        table_reset_tag = 0
     return
+
+
+def clean_text(text):
+    return text.encode('utf-8', 'ignore').decode('utf-8')
 
 
 @csrf_exempt
@@ -173,15 +176,15 @@ def process_result(request):
         # URL 디코딩
         decoded_json_str = urllib.parse.unquote(request.body)
 
-# JSON 문자열을 파이썬 객체로 디코딩
+        # JSON 문자열을 파이썬 객체로 디코딩
         data = json.loads(decoded_json_str)
 
         print("Parsed data:", data)
         count = data.get('clickedButtons', [])
-        for i in range(len(count)):
-            if count[i] == 8:
-                count[i]=0
-         
+        #for i in range(len(count)):
+        #    if count[i] == 8:
+        #        count[i] = 0
+
         print(count)
         numbers = len(count)
         spread = data.get('spread', "")
@@ -204,67 +207,161 @@ def process_result(request):
         # random_numbers의 index는 0~8까지
         cards = []
         cards = [deck[random_numbers[i - 1]] for i in count]  # i: 0~7 / count: 1~8
-        print("출력>" , cards, spread, question)
+        print("출력>", cards, spread, question)
         # deck의 index는 0~77까지
         if spread == 'Fortune':
-            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Fortune.txt'
-            file = open(file_path, 'r', encoding="UTF-8")
-            prompt = str(file.read())
-            file.close()
-            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            file_path = Path(settings.BASE_DIR) / 'static' / 'Prompt' / 'Fortune.txt'
+            # 파일을 'utf-8'로 읽되, 오류가 발생하면 무시
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            if not content.strip():  # 파일이 비어 있거나 공백만 포함되어 있는지 확인
+                return JsonResponse({"error": "파일 내용이 비어 있습니다."}, status=404)
+
+            print("파일 내용:")
+            # print(content)
+
+            # 'prompt' 변수 생성
+            prompt = content + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+
+            # 모델의 generate_content 호출 (빈 문자열이 아닌 실제 prompt를 넘겨야 합니다)
             result = model.generate_content(prompt)
+
+            print(result.text)
+            # 결과를 JSON 형식으로 반환
         elif spread == 'Oracle':
-            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Oracle.txt'
-            file = open(file_path, 'r', encoding="UTF-8")
-            prompt = str(file.read())
-            file.close()
-            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
-            result = model.generate_content(f"""""")
+            # 파일 경로 설정
+            file_path = Path(settings.BASE_DIR) / 'static' / 'Prompt' / 'Oracle.txt'
+            # 파일을 'utf-8'로 읽되, 오류가 발생하면 무시
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            if not content.strip():  # 파일이 비어 있거나 공백만 포함되어 있는지 확인
+                return JsonResponse({"error": "파일 내용이 비어 있습니다."}, status=404)
+
+            print("파일 내용:")
+            #print(content)
+
+            # 'prompt' 변수 생성
+            prompt = content + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+
+            # 모델의 generate_content 호출 (빈 문자열이 아닌 실제 prompt를 넘겨야 합니다)
+            result = model.generate_content(prompt)
+
+            print(result.text)
+            # 결과를 JSON 형식으로 반환
+
         elif spread == 'Cross':
-            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Cross.txt'
-            file = open(file_path, 'r', encoding="UTF-8")
-            prompt = str(file.read())
-            file.close()
-            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
-            result = model.generate_content(f"""""")
-        
+            # 파일 경로 설정
+            file_path = Path(settings.BASE_DIR) / 'static' / 'Prompt' / 'Cross.txt'
+            # 파일을 'utf-8'로 읽되, 오류가 발생하면 무시
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            if not content.strip():  # 파일이 비어 있거나 공백만 포함되어 있는지 확인
+                return JsonResponse({"error": "파일 내용이 비어 있습니다."}, status=404)
+
+            print("파일 내용:")
+            # print(content)
+
+            # 'prompt' 변수 생성
+            prompt = content + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+
+            # 모델의 generate_content 호출 (빈 문자열이 아닌 실제 prompt를 넘겨야 합니다)
+            result = model.generate_content(prompt)
+
+            print(result.text)
+            # 결과를 JSON 형식으로 반환
         elif spread == 'Triangle':
-            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Triangle.txt'
-            file = open(file_path, 'r', encoding="UTF-8")
-            prompt = str(file.read())
-            file.close()
-            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
-            result = model.generate_content(f"""""")
+            # 파일 경로 설정
+            file_path = Path(settings.BASE_DIR) / 'static' / 'Prompt' / 'Triangle.txt'
+            # 파일을 'utf-8'로 읽되, 오류가 발생하면 무시
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            if not content.strip():  # 파일이 비어 있거나 공백만 포함되어 있는지 확인
+                return JsonResponse({"error": "파일 내용이 비어 있습니다."}, status=404)
+
+            print("파일 내용:")
+            # print(content)
+
+            # 'prompt' 변수 생성
+            prompt = content + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+
+            # 모델의 generate_content 호출 (빈 문자열이 아닌 실제 prompt를 넘겨야 합니다)
+            result = model.generate_content(prompt)
+
+            print(result.text)
+            # 결과를 JSON 형식으로 반환
         elif spread == 'Star':
-            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Star.txt'
-            file = open(file_path, 'r', encoding="UTF-8")
-            prompt = str(file.read())
-            file.close()
-            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
-            result = model.generate_content(f"""""")
+            # 파일 경로 설정
+            file_path = Path(settings.BASE_DIR) / 'static' / 'Prompt' / 'Star.txt'
+            # 파일을 'utf-8'로 읽되, 오류가 발생하면 무시
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            if not content.strip():  # 파일이 비어 있거나 공백만 포함되어 있는지 확인
+                return JsonResponse({"error": "파일 내용이 비어 있습니다."}, status=404)
+
+            print("파일 내용:")
+            # print(content)
+
+            # 'prompt' 변수 생성
+            prompt = content + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+
+            # 모델의 generate_content 호출 (빈 문자열이 아닌 실제 prompt를 넘겨야 합니다)
+            result = model.generate_content(prompt)
+
+            print(result.text)
+            # 결과를 JSON 형식으로 반환
         elif spread == 'Future-1':
-            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Future1.txt'
-            file = open(file_path, 'r', encoding="UTF-8")
-            prompt = str(file.read())
-            file.close()
-            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
-            result = model.generate_content(f"""""")
+            # 파일 경로 설정
+            file_path = Path(settings.BASE_DIR) / 'static' / 'Prompt' / 'Future1.txt'
+            # 파일을 'utf-8'로 읽되, 오류가 발생하면 무시
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            if not content.strip():  # 파일이 비어 있거나 공백만 포함되어 있는지 확인
+                return JsonResponse({"error": "파일 내용이 비어 있습니다."}, status=404)
+
+            print("파일 내용:")
+            # print(content)
+
+            # 'prompt' 변수 생성
+            prompt = content + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+
+            # 모델의 generate_content 호출 (빈 문자열이 아닌 실제 prompt를 넘겨야 합니다)
+            result = model.generate_content(prompt)
+
+            print(result.text)
+            # 결과를 JSON 형식으로 반환
         elif spread == 'Future-2':
-            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Future2.txt'
-            file = open(file_path, 'r', encoding="UTF-8")
-            prompt = str(file.read())
-            file.close()
-            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
-            result = model.generate_content(f"""""")
+            # 파일 경로 설정
+            file_path = Path(settings.BASE_DIR) / 'static' / 'Prompt' / 'Future2.txt'
+            # 파일을 'utf-8'로 읽되, 오류가 발생하면 무시
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            if not content.strip():  # 파일이 비어 있거나 공백만 포함되어 있는지 확인
+                return JsonResponse({"error": "파일 내용이 비어 있습니다."}, status=404)
+
+            print("파일 내용:")
+            # print(content)
+
+            # 'prompt' 변수 생성
+            prompt = content + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+
+            # 모델의 generate_content 호출 (빈 문자열이 아닌 실제 prompt를 넘겨야 합니다)
+            result = model.generate_content(prompt)
+
+            print(result.text)
+            # 결과를 JSON 형식으로 반환
         elif spread == 'Start':
-            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Start.txt'
-            file = open(file_path, 'r', encoding="UTF-8")
-            prompt = str(file.read())
-            file.close()
-            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
-            result = model.generate_content(f"""""")
-        
-        else: 
+            # 파일 경로 설정
+            file_path = Path(settings.BASE_DIR) / 'static' / 'Prompt' / 'Start.txt'
+            # 파일을 'utf-8'로 읽되, 오류가 발생하면 무시
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            if not content.strip():  # 파일이 비어 있거나 공백만 포함되어 있는지 확인
+                return JsonResponse({"error": "파일 내용이 비어 있습니다."}, status=404)
+
+            print("파일 내용:")
+            # print(content)
+
+            # 'prompt' 변수 생성
+            prompt = content + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+
+            # 모델의 generate_content 호출 (빈 문자열이 아닌 실제 prompt를 넘겨야 합니다)
+            result = model.generate_content(prompt)
+
+            print(result.text)
+
+        else:
             result = model.generate_content(f"""#입력문
 너는 타로 점을 보는 사람이다. 너에게 점을 의뢰하는 사람은 너에게 고민거리를 말할것이다. 그 사람이 선택한 타로 카드를 보고 그 타로 카드의 의미와 연관지어서 점을 보면 된다. 그 사람이 말한 고민은 [#고민]에 있으며 선택한 타로 카드는 [#카드]에 있다. 이 고객은 카드를 매우 특이한 방법으로 배치하여서 카드 배열에 따른 해석을 할 수 없으니 그냥 카드의 의미와 고민을 알아서 맞추어 해석해야 한다. 
 #카드
@@ -282,9 +379,10 @@ def process_result(request):
 """)
         resultCard = {}
         for idx, cardName in enumerate(cards):
-            resultCard[count[idx]] = cardName+"~"+tarot_cards_dict[cardName]
+            resultCard[count[idx]] = cardName + "~" + tarot_cards_dict[cardName]
 
-        response = {'result': result.text, 'cards': resultCard }
+        response = {'result': result.text, 'cards': resultCard}
+        print(resultCard)
 
         return JsonResponse(response)
 

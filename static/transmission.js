@@ -49,25 +49,30 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             let i = 0;
             Object.entries(data.cards).forEach(([card, imageUrl]) => {
-                let spl = imageUrl.split("~");
+            let spl = imageUrl.split("~");
 
-                console.log(`Card: ${card}, Image URL: ${spl[1]}`);
-                const tarotImage = document.getElementById('button-' + card);
-                
+            console.log(`Card: ${card}, Image URL: ${spl[1]}`);
+
+            const tarotImage = document.getElementById('button-' + card);
+            if (tarotImage) { // tarotImage가 null이 아닌지 확인
                 // 이미지 뒤집기 클래스 추가
                 tarotImage.style.transform = "rotateY(180deg)";
 
                 // 0.6초 후에 이미지 변경 (CSS 애니메이션 시간과 일치)
                 setTimeout(() => {
-                    tarotImage.style.transform = "";
+                    tarotImage.style.transform = ""; // 기본 상태로 되돌리기
                     tarotImage.style.transform = 'scale(1.0)'; // 클릭된 버튼 표시 색상
                     tarotImage.style.backgroundImage = `url(${spl[1]})`;
                     tarotImage.style.textAlign = "center";
                     tarotImage.style.fontWeight = "bold";
-                    tarotImage.style.border = "3px solid gray"
+                    tarotImage.style.border = "3px solid gray";
                     tarotImage.textContent = spl[0];
                 }, 600);
-            });
+            } else {
+                console.warn(`Element with ID 'button-${card}' not found.`);
+            }
+        });
+
 
             document.getElementById('result-container').style.display = 'block';
             document.getElementById('result').innerHTML = '<p>해석: ' + data.result + '</p>';
