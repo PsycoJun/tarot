@@ -3,11 +3,13 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.conf import settings
 import json
 import random
 from dotenv import load_dotenv
 import urllib.parse
 import os
+from pathlib import Path
 
 load_dotenv()
 
@@ -145,7 +147,6 @@ tarot_cards_dict = {
 
 
 
-
 table_reset_tag=0
 random_numbers=[]
 
@@ -175,9 +176,12 @@ def process_result(request):
 # JSON 문자열을 파이썬 객체로 디코딩
         data = json.loads(decoded_json_str)
 
-        print(data)
         print("Parsed data:", data)
         count = data.get('clickedButtons', [])
+        for i in range(len(count)):
+            if count[i] == 8:
+                count[i]=0
+         
         print(count)
         numbers = len(count)
         spread = data.get('spread', "")
@@ -202,37 +206,80 @@ def process_result(request):
         cards = [deck[random_numbers[i - 1]] for i in count]  # i: 0~7 / count: 1~8
         print("출력>" , cards, spread, question)
         # deck의 index는 0~77까지
-        result = model.generate_content(f"""#입력문
-너는 타로 점을 보는 사람이다. 어떤 사람이 선택한 타로 카드를 보고 그 타로 카드의 의미와 연관지어서 점을 보면 된다. 그 사람이 선택한 타로 카드는 [#카드]에 있다. 그 사람이 선택한 스프레드는 [#스프레드]에 있다. 어떻게 대답해야 하는지는 [#스프레드-종류]와 [#출력형식]과 [#예시]를 참고한다. 
+        if spread == 'Fortune':
+            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Fortune.txt'
+            file = open(file_path, 'r', encoding="UTF-8")
+            prompt = str(file.read())
+            file.close()
+            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            result = model.generate_content(prompt)
+        elif spread == 'Oracle':
+            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Oracle.txt'
+            file = open(file_path, 'r', encoding="UTF-8")
+            prompt = str(file.read())
+            file.close()
+            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            result = model.generate_content(f"""""")
+        elif spread == 'Cross':
+            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Cross.txt'
+            file = open(file_path, 'r', encoding="UTF-8")
+            prompt = str(file.read())
+            file.close()
+            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            result = model.generate_content(f"""""")
+        
+        elif spread == 'Triangle':
+            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Triangle.txt'
+            file = open(file_path, 'r', encoding="UTF-8")
+            prompt = str(file.read())
+            file.close()
+            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            result = model.generate_content(f"""""")
+        elif spread == 'Star':
+            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Star.txt'
+            file = open(file_path, 'r', encoding="UTF-8")
+            prompt = str(file.read())
+            file.close()
+            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            result = model.generate_content(f"""""")
+        elif spread == 'Future-1':
+            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Future1.txt'
+            file = open(file_path, 'r', encoding="UTF-8")
+            prompt = str(file.read())
+            file.close()
+            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            result = model.generate_content(f"""""")
+        elif spread == 'Future-2':
+            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Future2.txt'
+            file = open(file_path, 'r', encoding="UTF-8")
+            prompt = str(file.read())
+            file.close()
+            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            result = model.generate_content(f"""""")
+        elif spread == 'Start':
+            file_path = Path(settings.BASE_DIR) / 'tarot_app' / 'Prompt' / 'Start.txt'
+            file = open(file_path, 'r', encoding="UTF-8")
+            prompt = str(file.read())
+            file.close()
+            prompt = prompt + f'\n#카드\n{cards}' + f'\n#고민\n{question}'
+            result = model.generate_content(f"""""")
+        
+        else: 
+            result = model.generate_content(f"""#입력문
+너는 타로 점을 보는 사람이다. 너에게 점을 의뢰하는 사람은 너에게 고민거리를 말할것이다. 그 사람이 선택한 타로 카드를 보고 그 타로 카드의 의미와 연관지어서 점을 보면 된다. 그 사람이 말한 고민은 [#고민]에 있으며 선택한 타로 카드는 [#카드]에 있다. 이 고객은 카드를 매우 특이한 방법으로 배치하여서 카드 배열에 따른 해석을 할 수 없으니 그냥 카드의 의미와 고민을 알아서 맞추어 해석해야 한다. 
 #카드
 {cards}
-#스프레드
-{spread}
-#스프레드-종류
-Fortune: [1.과제 : 내가 오늘 꼭 해야 할 일이 있는지, 2.상황 : 현재 오늘의 상황이 어떤지 카드를 통해서 살펴봅니다, 3.결과 : 나의 상황과 과제들의 결과가 어떻게 끝나는지 봅니다.]
-Oracle: [1.현재의 문제에 대한 조언과 상황, 2. 나아갈 길을 보여줍니다. 3.미래에 대한 조언과 상황]
-Future-1: [1.내가 이미 알고있고 활용 할 수 있는길, 2.내가 잘 할 수 있는일, 3.새로운 일, 4.내가 배울 수 있는일]
-Future-2: [1.기회 또는 경향, 현재상황에서의 조언, 2. 과거의 일, 3.,핵심요소와 지금의 상황, 4.미래와 새로운것, 5.기회 또는 경향과 현재상황에서의 조언]
-Start: [1.내가 처해있는 상황, 2.이곳에서 내가해야할 일, 3.이 상황에서 나아갈길과 목표, 4.나의 강점, 5.이 상황에서 나아갈길과 목표]
 #고민
 {question}
 #출력형식
+-사용자의 고민을 언급하며 그에 대해 공감해주는 말을 해야 한다. 
 -선택된 카드의 의미를 순차적으로 설명한 뒤 종합적인 해석을 설명한다. 
 -사람이 사람에게 말을 하듯이 설명해야 한다. 즉 문단을 나누거나 제목을 다는 등의 행동을 해서는 안된다. 
 -결과 해석 이외의 다른 말은 하지 않는다. 
 -카드의 이름은 영어로 말해서는 안된다. 
 -해석에서 한글과 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 만을 사용한다. 
 -한자, 영어, 가나 문자 등 한글 이외의 언어 문자는 사용하지 않는다.
-#예시
-
-오늘 꼭 해야 할 일로는 칼을 든 여왕이 나왔어. 이 카드는 너에게 지금 연애 상황에서 냉철하게 판단하고 이성적으로 행동할 것을 요구해. 감정에 휘둘리지 않고 명확하게 자신의 생각을 표현하는 것이 중요해.
-
-현재 상황을 나타내는 카드로는 6개의 검이 나왔어. 이 카드는 이동과 변화를 상징해. 현재 연애 상황에서 변화가 필요하다는 신호야. 지금까지 겪었던 어려움을 극복하고 더 나은 방향으로 나아갈 수 있는 기회가 있을 거야.
-
-결과를 나타내는 카드로는 8개의 컵이 나왔어. 이 카드는 떠남과 포기를 의미해. 현재의 연애에서 무언가를 포기하거나 떠나는 결정을 내려야 할 수도 있어. 이러한 결정이 힘들겠지만, 더 나은 미래를 위해 필요한 과정이야.
-
-종합적으로 보면, 너는 지금 연애에서 냉철한 판단이 필요하고, 변화의 시기가 다가오고 있어. 그리고 어떤 부분에서는 과감한 결단이 필요할 거야. 이 과정을 통해 너는 더 나은 연애를 할 수 있을 거야."""
-        )
+""")
         resultCard = {}
         for idx, cardName in enumerate(cards):
             resultCard[count[idx]] = cardName+"~"+tarot_cards_dict[cardName]
