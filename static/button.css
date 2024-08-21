@@ -12,6 +12,7 @@
 }
 
 .button {
+  position: relative;
   --background: #275efe;
   --text: #fff;
   --font-size: 16px;
