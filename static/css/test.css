@@ -53,7 +53,7 @@
 
 
 body {
-     background-image: url('/static/texture.jpg');
+     background-image: url('/static/img/texture.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: top left;
@@ -204,7 +204,7 @@ body {
     height: 170px;
     background-size: cover;
     background-position: center;
-    background-image: url('/static/tarot.png');
+    background-image: url('/static/img/tarot.png');
     transition: transform 0.6s;
     transform-style: preserve-3d;
     margin: 10px;
