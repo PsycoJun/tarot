@@ -31,14 +31,13 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
+INSTALLED_APPS = [# 'django.contrib.admin',  # 이 항목을 제거합니다.
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'tarot_app',
     'django.contrib.staticfiles',
+    'tarot_app',
 ]
 
 MIDDLEWARE = [
